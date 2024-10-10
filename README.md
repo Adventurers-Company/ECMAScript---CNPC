@@ -4,8 +4,8 @@ Welcome to the **ECMAScript for Custom NPCs** repository! This project contains 
 
 ## Features
 
-- **Fabled With Custom Npcs** Script that allows you to cause damage using fabled skills on custom npcs
-- [View Script](ECMAScripts/fabledDamageScript.js)
+- [View](ECMAScripts/FabledDamageScript.js) **Fabled With Custom Npcs** Script that allows you to cause damage using fabled skills on custom npcs 
+
 
 
 ## Contributions

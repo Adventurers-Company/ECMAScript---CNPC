@@ -21,6 +21,7 @@ var Plugin = {
 function attack(e) {
     try {
         if (e.target == null) {
+            print("Error: O alvo (e.target) é null.");
             return; 
         }
 
@@ -33,7 +34,7 @@ function attack(e) {
         // Adiciona o cooldown por jogador
         var playerName = e.player.getName();
         var currentTime = new Date().getTime();
-        if (lastAttackTime[playerName] && currentTime - lastAttackTime[playerName] < 1) { // 1 segundo de cooldown
+        if (lastAttackTime[playerName] && currentTime - lastAttackTime[playerName] < 1000) { // 1 segundo de cooldown
             print("Cooldown ativo, ataque ignorado.");
             return;
         }
@@ -76,7 +77,7 @@ function attack(e) {
             return;
         }
 
-        var amount = 15;
+        var amount = 1;
         var classification = "Piercing";
 
         // Aplica o dano à entidade se tudo estiver correto

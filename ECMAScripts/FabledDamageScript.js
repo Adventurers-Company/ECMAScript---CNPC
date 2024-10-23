@@ -1,89 +1,91 @@
+var amount = 1;
+var classification = "Piercing";
+var Getskill = "Piercing-Base";
+
+//---------------------------------------------------
 var Bukkit = Java.type('org.bukkit.Bukkit');
 var Class = Java.type('java.lang.Class');
-var UUID = Java.type('java.util.UUID'); // Importa a classe UUID
-var LivingEntity = Java.type('org.bukkit.entity.LivingEntity'); // Importa a classe LivingEntity
+var UUID = Java.type('java.util.UUID'); // Import the UUID class
+var LivingEntity = Java.type('org.bukkit.entity.LivingEntity'); // Import the LivingEntity class
 
-// Variável de cooldown para impedir múltiplos ataques em sequência
+// Cooldown variable to prevent multiple attacks in succession
 var lastAttackTime = {};
 
 var Plugin = {
-  type: function(pluginName, pluginClass) {
-    var plugin = Bukkit.getPluginManager().getPlugin(pluginName);
-    if (plugin == null) {
-        print("Error: Plugin " + pluginName + " not found or is not loaded.");
-        return null;
+    type: function(pluginName, pluginClass) {
+        var plugin = Bukkit.getPluginManager().getPlugin(pluginName);
+        if (plugin == null) {
+            print("Error: Plugin " + pluginName + " not found or is not loaded.");
+            return null;
+        }
+        var classLoader = plugin.getClass().getClassLoader();
+        return Class.forName(pluginClass, true, classLoader).static;
     }
-    var classLoader = plugin.getClass().getClassLoader();
-    return Class.forName(pluginClass, true, classLoader).static;
-  }
 };
 
 function attack(e) {
     try {
         if (e.target == null) {
-            print("Error: O alvo (e.target) é null.");
+            print("Error: The target (e.target) is null.");
             return; 
         }
 
-        var npcUuidString = e.target.getUUID(); // Obtém o UUID como string
+        var npcUuidString = e.target.getUUID(); // Get the UUID as a string
         if (npcUuidString == null || npcUuidString.isEmpty()) {
-            print("Error: UUID do alvo não pôde ser obtido.");
+            print("Error: Could not obtain the target's UUID.");
             return; 
         }
 
-        // Adiciona o cooldown por jogador
+        // Add cooldown per player
         var playerName = e.player.getName();
         var currentTime = new Date().getTime();
-        if (lastAttackTime[playerName] && currentTime - lastAttackTime[playerName] < 1000) { // 1 segundo de cooldown
-            print("Cooldown ativo, ataque ignorado.");
+        if (lastAttackTime[playerName] && currentTime - lastAttackTime[playerName] < 1000) { // 1 second cooldown
+            print("Active cooldown, attack ignored.");
             return;
         }
-        lastAttackTime[playerName] = currentTime; // Atualiza o tempo do último ataque
+        lastAttackTime[playerName] = currentTime; // Update the last attack time
 
-        var npcUuid = UUID.fromString(npcUuidString); // Converte a string em UUID
+        var npcUuid = UUID.fromString(npcUuidString); // Convert the string to UUID
         if (npcUuid == null) {
-            print("Error: UUID inválido ou conversão falhou.");
+            print("Error: Invalid UUID or conversion failed.");
             return; 
         }
 
-        var Fabled = Plugin.type('Fabled', 'studio.magemonkey.fabled.Fabled'); // Obtém a classe Fabled
+        var Fabled = Plugin.type('Fabled', 'studio.magemonkey.fabled.Fabled'); // Get the Fabled class
         if (Fabled == null) {
-            print("Error: Plugin Fabled não foi encontrado ou carregado.");
+            print("Error: Fabled plugin not found or loaded.");
             return; 
         }
 
-        // Recupera a entidade do Minecraft associada ao NPC usando o UUID
+        // Retrieve the Minecraft entity associated with the NPC using the UUID
         var mcNpc = Bukkit.getServer().getEntity(npcUuid);
         if (mcNpc == null) {
-            print("Error: Nenhuma entidade encontrada com o UUID fornecido.");
+            print("Error: No entity found with the provided UUID.");
             return;
         }
         if (!(mcNpc instanceof LivingEntity)) {
-            print("Error: A entidade recuperada não é uma LivingEntity.");
+            print("Error: The retrieved entity is not a LivingEntity.");
             return;
         }
 
-        // Encontra o jogador pelo nome usando a API do Bukkit
+        // Find the player by name using the Bukkit API
         var bukkitPlayer = Bukkit.getPlayer(e.player.getName());
         if (bukkitPlayer == null) {
-            print("Error: Jogador não encontrado.");
+            print("Error: Player not found.");
             return;
         }
 
-        // Usa Fabled.getSkill().damage para causar dano
-        var skill = Fabled.getSkill("Piercing-Base");
+        // Use Fabled.getSkill().damage to deal damage
+        var skill = Fabled.getSkill(Getskill);
         if (skill == null) {
-            print("Error: Habilidade 'Piercing-Base' não encontrada.");
+            print("Error: Skill 'Piercing-Base' not found.");
             return;
         }
 
-        var amount = 1;
-        var classification = "Piercing";
-
-        // Aplica o dano à entidade se tudo estiver correto
+        // Apply damage to the entity if everything is correct
         skill.damage(mcNpc, amount, bukkitPlayer, classification);
-        print("Dano aplicado com sucesso.");
+        print("Damage applied successfully.");
     } catch (err) {
-        print("Erro inesperado: " + err.message); // Captura qualquer erro inesperado e imprime a mensagem de erro
+        print("Unexpected error: " + err.message); // Catch any unexpected error and print the error message
     }
 }
